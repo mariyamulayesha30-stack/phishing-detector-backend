@@ -23,7 +23,7 @@ def extract_features(url):
     features['Prefix_Suffix'] = -1 if '-' in domain else 1
     features['having_Sub_Domain'] = 1 if url.count('.') <= 2 else (0 if url.count('.') == 3 else -1)
     features['HTTPS_token'] = -1 if not url.startswith('https') else 1
-    suspicious_words = ['login', 'verify', 'secure', 'account', 'update', 'bank', 'confirm']
+    suspicious_words = ['login', 'verify', 'secure', 'account', 'update', 'bank', 'confirm', 'free', 'gift', 'claim', 'prize', 'winner', 'urgent']
     features['Abnormal_URL'] = -1 if any(word in url.lower() for word in suspicious_words) else 1
     features['Redirect'] = -1 if url.count('-') > 2 else 0
     suspicious_tld = ['.tk', '.ml', '.ga', '.cf', '.gq']
@@ -42,6 +42,8 @@ def predict():
     final_score = (ml_phishing_prob + (suspicious_count/12*100)) / 2
     if features['having_IPhaving_IP_Address'] == -1:
         final_score = max(final_score, 75)
+    if features['Shortining_Service'] == -1:
+        final_score = max(final_score, 55)
     result = "PHISHING" if final_score > 45 else "SAFE"
     return jsonify({'url': url, 'score': round(final_score, 2), 'result': result})
 
